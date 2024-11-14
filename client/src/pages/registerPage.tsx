@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux';
 import axios from '../utils/urlProxy';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 
 const RegisterPage = () => {
@@ -12,9 +11,7 @@ const RegisterPage = () => {
     const [nameMessage, setNameMessage] = useState('');
     const [emailMessage, setEmailMessage] = useState('');
     const [passwordMessage, setPasswordMessage] = useState('');
-    const [errorMessage, setErrorMessage] = useState(null);
-
-    const dispatch = useDispatch();
+    const [errorMessage, setErrorMessage] = useState('');
 
     const navigate = useNavigate();
 

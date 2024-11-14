@@ -1,11 +1,15 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux';
 import axios from '../utils/urlProxy';
 import './AddUserModal.css'
-import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 
-const AddUserModal = ({ isOpen, onClose, fetchUsers}) => {
+interface AddUserModalProps {
+  isOpen: () => boolean;
+  onClose: () => void;
+  fetchUsers: () => void;
+}
+
+const AddUserModal: React.FC<AddUserModalProps> = ({ onClose, fetchUsers}) => {
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -14,9 +18,6 @@ const AddUserModal = ({ isOpen, onClose, fetchUsers}) => {
     const [emailMessage, setEmailMessage] = useState('');
     const [passwordMessage, setPasswordMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const handleAddUser = async (e: React.FormEvent) => {
         e.preventDefault();

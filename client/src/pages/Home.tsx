@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MdEdit } from "react-icons/md";
 import Navbar from '../components/Navbar';
 import customAxios from '../utils/apiClient';
 import { Link, useNavigate } from 'react-router-dom';
-import './Home.css';
 import profile_pic from '../../public/profile_pic.png'
+import './Home.css';
+
+interface User {
+  name: string;
+  email: string;
+  image?: string;
+}
 
 const Home = () => {
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
     useEffect(() => {

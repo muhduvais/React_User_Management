@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MdEdit, MdDelete } from "react-icons/md";
 import { AiOutlineUserAdd } from "react-icons/ai";
 import { IoLogOut } from "react-icons/io5";
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import profile_pic from '../../public/profile_pic.png';
 import customAxios from '../utils/apiClient';
 import { useDispatch } from 'react-redux';
@@ -10,21 +10,29 @@ import { logout } from '../redux/slices/authSlice';
 import AddUserModal from '../components/AddUserModal';
 import EditUserModal from '../components/EditUserModal';
 
+interface User {
+    _id: string;
+    userId: string;
+    name: string;
+    email: string;
+    image?: string;
+}
+
 const AdminDashboard = () => {
-    const [users, setUsers] = useState([]);
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [editDetails, setEditDetails] = useState({});
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [deleteId, setDeleteId] = useState(null);
+    const [users, setUsers] = useState<User[]>([]);
+    const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+    const [editDetails, setEditDetails] = useState<Partial<User> | null>({});
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
  
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const clearEditDetails = () => setEditDetails(null);
+    const clearEditDetails = () => setEditDetails({});
 
     // Fetch users function
-    const fetchUsers = async () => {
+    const fetchUsers = async (): Promise<void> => {
         const token = localStorage.getItem('token');
         if (!token) return;
 
@@ -53,7 +61,7 @@ const AdminDashboard = () => {
 
 
     // Delete user
-    const deleteUser = async () => {
+    const deleteUser = async (): Promise<void> => {
         try {
             console.log('User Id: ', deleteId)
             const response = await customAxios.delete(`/api/admin/deleteUser/${deleteId}`);
@@ -123,7 +131,7 @@ const AdminDashboard = () => {
         </div>
         {isAddModalOpen && (
             <AddUserModal 
-                isOpen={isAddModalOpen} 
+                isOpen={() => isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)} 
                 fetchUsers={fetchUsers}
             />

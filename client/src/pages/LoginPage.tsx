@@ -6,8 +6,15 @@ import { Link } from 'react-router-dom';
 import './LoginPage.css'
 import { useNavigate } from 'react-router-dom'
 import { AxiosError } from 'axios';
-import apiClient from '../utils/apiClient';
-import Cookies from 'js-cookie';
+
+interface LoginResponse {
+  token: string;
+  refreshToken: string;
+  name: string;
+  email: string;
+  isAdmin: boolean;
+  message: string;
+}
 
 const LoginPage: React.FC = () => {
 
@@ -20,11 +27,11 @@ const LoginPage: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const validateEmail = (e) => {
+  const validateEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputEmail = e.target.value.trim();
     setEmail(inputEmail);
 
-    const validate = (email) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+    const validate = (email: string) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
     if ((emailMessage || errorMessage) && !validate(inputEmail)) {
       setEmailMessage('Please enter a valid email!');
@@ -66,7 +73,7 @@ const LoginPage: React.FC = () => {
     if (isValid) {
 
         try {
-            const response = await axios.post('/api/auth/login', { 
+            const response = await axios.post<LoginResponse>('/api/auth/login', { 
                 email, 
                 password: inputPassword 
             });

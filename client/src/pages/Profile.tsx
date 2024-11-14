@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef, useTransition } from 'react';
-import { MdEdit, MdDone, MdEmail } from "react-icons/md";
+import { useEffect, useState, useRef } from 'react';
+import { MdEdit, MdDone } from "react-icons/md";
 import { BiDotsHorizontal } from "react-icons/bi";
 import Navbar from '../components/Navbar';
 import { AxiosError } from 'axios';
@@ -8,9 +8,16 @@ import { useNavigate } from 'react-router-dom';
 import ProfilePicture from '../components/ProfilePicture';
 import './Home.css';
 
+interface User {
+    _id: string;
+    name: string;
+    email: string;
+    image?: string;
+  }
+
 const Home = () => {
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [editName, setEditName] = useState(false);
   const [editEmail, setEditEmail] = useState(false);
   const [userName, setUserName] = useState('');
@@ -20,8 +27,8 @@ const Home = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const navigate = useNavigate();
-  const nameRef = useRef(null);
-  const emailRef = useRef(null);
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (editName && nameRef.current) {
@@ -77,22 +84,22 @@ const Home = () => {
             if (!nameValue) {
                 setErrorMessage('Please enter your name');
                 valid = false;
-                nameRef.current.focus()
+                if (nameRef.current) nameRef.current.focus()
             } else if (!validateName(nameValue)) {
                 setErrorMessage('Please enter a valid name');
                 valid = false;
-                nameRef.current.focus()
+                if (nameRef.current) nameRef.current.focus()
             }
           } else {
             const emailValue = email.trim();
             if (!emailValue) {
                 setErrorMessage('Please enter the email');
                 valid = false;
-                emailRef.current.focus()
+                if (emailRef.current) emailRef.current.focus();
             } else if (!validateEmail(emailValue)) {
                 setErrorMessage('Please enter a valid email');
                 valid = false;
-                emailRef.current.focus()
+                if (emailRef.current) emailRef.current.focus();
             }
           }
 
@@ -103,12 +110,12 @@ const Home = () => {
           }
 
         const userInfo = {
-            name: type === 'name' ? userName.trim() : user.name,
-            email: type === 'email' ? email.trim() : user.email,
+            name: type === 'name' ? userName.trim() : user?.name,
+            email: type === 'email' ? email.trim() : user?.email,
         }
 
         try {
-            const response = await customAxios.put('/api/user/editUser', userInfo);
+            await customAxios.put('/api/user/editUser', userInfo);
         } catch (error) {
             if (error instanceof AxiosError) {
                 const errorMessage = error.response?.data?.message || 'An error occurred';
@@ -130,7 +137,7 @@ const Home = () => {
 
     const handleProfilePictureUpload = (imageUrl: string) => {
         setUser((prevUser) => ({
-          ...prevUser,
+          ...prevUser!,
           image: imageUrl,
         }));
       };
