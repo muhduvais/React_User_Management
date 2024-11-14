@@ -1,0 +1,13 @@
+@keyframes wave {
+    0% { scale:120%; transform: rotate(0deg);}
+    25% { scale:140%; transform: rotate(15deg); }
+    50% { scale:150%; transform: rotate(-10deg); }
+    75% { scale:130%; transform: rotate(15deg); }
+    100% { scale:100%; transform: rotate(0deg); }
+  }
+  
+  .group:hover .group-hover\:animate-wave {
+    animation: wave 0.5s ease-in-out;
+    transform-origin: 70% 70%;
+  }
+  
