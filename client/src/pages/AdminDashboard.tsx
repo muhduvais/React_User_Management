@@ -20,6 +20,8 @@ interface User {
 
 const AdminDashboard = () => {
     const [users, setUsers] = useState<User[]>([]);
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>('');
     const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const [editDetails, setEditDetails] = useState<Partial<User> | null>({});
@@ -40,8 +42,9 @@ const AdminDashboard = () => {
             const response = await customAxios.get('/api/admin/users');
             if (response.status === 200) {
                 setUsers(response.data.users);
+                setFilteredUsers(response.data.users);
             } else {
-                navigate('/login')
+                navigate('/login');
             }
         } catch (error) {
             console.error("Failed to fetch user data:", error);
@@ -53,17 +56,27 @@ const AdminDashboard = () => {
         fetchUsers();
     }, []);
 
+    // Search function
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const searchValue = event.target.value.toLowerCase();
+        setSearchTerm(searchValue);
+
+        const filtered = users.filter(user => 
+            user.name.toLowerCase().includes(searchValue)
+        );
+        setFilteredUsers(filtered);
+    };
+
     // Logout
     const handleLogout = () => {
         dispatch(logout());
         navigate('/login');
-    }
-
+    };
 
     // Delete user
     const deleteUser = async (): Promise<void> => {
         try {
-            console.log('User Id: ', deleteId)
+            console.log('User Id: ', deleteId);
             const response = await customAxios.delete(`/api/admin/deleteUser/${deleteId}`);
             if (response.status === 200) {
                 setIsDeleteModalOpen(false);
@@ -73,13 +86,20 @@ const AdminDashboard = () => {
         } catch (error) {
             console.error("Failed to delete the user:", error);
         }
-    }
+    };
 
     return (
     <div className='relative w-screen h-screen'>
         <div className={`w-screen h-screen bg-[#222222] flex flex-col items-center text-[#ddd5d5] p-5 ${isAddModalOpen || isEditModalOpen || isDeleteModalOpen ? 'blur-sm' : ''}`}>
-            <div className="header flex items-center gap-x-2">
+            <div className="header flex flex-col sm:flex-row items-center justify-center gap-x-2">
                 <h2 className="text-5xl font-extrabold mb-5">Users List</h2>
+                <input 
+                    type="text" 
+                    value={searchTerm} 
+                    onChange={handleSearch} 
+                    placeholder="Search by name" 
+                    className="text-[#fff] mx-3 rounded-md px-3 py-1 outline-none border-2 border-[#ddd5d5] bg-transparent"
+                />
                 <div className="btns flex items-center justify-center ml-5">
                     <div className='add-btn items-center justify-center gap-x-1 cursor-pointer flex pl-2 bg-[#343434] hover:bg-[#404040] font-bold px-3 py-1 mx-1 rounded-md transition-all duration-300'
                     onClick={() => setIsAddModalOpen(true)}>
@@ -96,8 +116,8 @@ const AdminDashboard = () => {
 
             <div className="w-full max-w-7xl h-[80%] overflow-y-auto bg-[#292929] rounded-xl p-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {users.length < 1 && <h2 className='text-3xl text-center'>No users found!</h2>}
-                    {users.map(user => (
+                    {filteredUsers.length < 1 && <h2 className='text-3xl text-center'>No users found!</h2>}
+                    {filteredUsers.map(user => (
                         <div key={user._id} className="relative group flex flex-col items-center justify-center bg-[#373737] rounded-lg p-5">
                             <div className="absolute top-3 right-12 bg-[#72716f25] hover:bg-[#c6c2bc25] cursor-pointer p-1 rounded transition-all duration-300"
                             onClick={() => {
@@ -107,22 +127,21 @@ const AdminDashboard = () => {
                                     name: user.name,
                                     email: user.email,
                                     image: user.image
-                                })
+                                });
                             }}>
                                 <MdEdit size={20} />
                             </div>
                             <button className="absolute top-3 right-3 bg-[#72716f25] hover:bg-[#6a1f1f] p-1 rounded transition-all duration-300"
                             onClick={() => {
                                 setIsDeleteModalOpen(true);
-                                console.log('User: ', user);
                                 setDeleteId(user._id);
                             }}>
                                 <MdDelete size={20} />
                             </button>
                             <img src={user?.image || profile_pic} alt="profile picture" className="w-24 h-24 rounded-full mb-4" />
                             <div className="text-center">
-                                <h3 className="text-xl font-semibold"><span className='text-[#7f7f7f]'>Name: </span>{user ? user.name : 'Guest'}</h3>
-                                <p className="text-lg text-[#7f7f7f]">Email: {user ? user.email : 'Email'}</p>
+                                <h3 className="text-xl font-semibold"><span className='text-[#7f7f7f]'>Name: </span>{user.name}</h3>
+                                <p className="text-lg text-[#7f7f7f]">Email: {user.email}</p>
                             </div>
                         </div>
                     ))}
